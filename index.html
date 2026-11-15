@@ -4039,7 +4039,7 @@ function extraFull(x, plan, p) {
   const dn = S.done[x.id];
   return Object.assign(e, { blocks: cs.blocks, lines: cs.lines, steps: cs.steps, notes: cs.notes, min: dn ? e.min : cs.min, tss: dn ? e.tss : cs.tss, IF: dn ? e.IF : cs.IF, km: dn ? e.km : (cs.km || 0) });
 }
-const hzRows = (sp, m) => (sp === 'bike' ? E.hrZonesBike(m) : E.hrZonesRun(m)).map(z => `<tr><td>${z.z} · ${esc(z.n)}${z.manual ? ' <span class="est">tuyo</span>' : ''}</td><td class="r" style="white-space:nowrap"><input class="hzin" type="text" inputmode="numeric" data-hz="${sp}:${z.z}:0" value="${z.b[0] || ''}" placeholder="0" aria-label="${z.z} pulso mínimo" style="width:48px;text-align:right"> – <input class="hzin" type="text" inputmode="numeric" data-hz="${sp}:${z.z}:1" value="${z.b[1]}" aria-label="${z.z} pulso máximo" style="width:48px;text-align:right"> ppm</td></tr>`).join('') + `<tr><td colspan="2" class="muted" style="font-size:12.5px">Escribe tu pulso mínimo y máximo de cada zona (el de tu Garmin) y el plan lo usará en los entrenos. ${((S.hrZ || {})[sp] && Object.keys(S.hrZ[sp]).length) ? '<button class="btn link" data-act="hz-reset" data-sp="' + sp + '">Volver a los valores estimados</button>' : 'Si lo dejas como está, son valores estimados.'}</td></tr>`;
+const hzRows = (sp, m) => (sp === 'bike' ? E.hrZonesBike(m) : E.hrZonesRun(m)).map(z => `<tr><td>${z.z} · ${esc(z.n)}${z.manual ? ' <span class="est">tuyo</span>' : ''}</td><td class="r" style="white-space:nowrap"><input class="hzin" type="text" data-hz="${sp}:${z.z}:0" value="${z.b[0] || ''}" placeholder="0" aria-label="${z.z} pulso mínimo" style="width:48px;text-align:right"> – <input class="hzin" type="text" data-hz="${sp}:${z.z}:1" value="${z.b[1]}" aria-label="${z.z} pulso máximo" style="width:48px;text-align:right"> ppm</td></tr>`).join('') + `<tr><td colspan="2" class="muted" style="font-size:12.5px">Escribe tu pulso mínimo y máximo de cada zona (el de tu Garmin) y el plan lo usará en los entrenos. ${((S.hrZ || {})[sp] && Object.keys(S.hrZ[sp]).length) ? '<button class="btn link" data-act="hz-reset" data-sp="' + sp + '">Volver a los valores estimados</button>' : 'Si lo dejas como está, son valores estimados.'}</td></tr>`;
 function compute() {
   const p0 = Object.assign({}, P(), { planSev: S.planSev === undefined ? !!S.profile : !!S.planSev, hrz: S.hrZ || {}, hmRef: +S.hmRef || 0 });
   const plan = E.buildPlan(p0, TODAY);
@@ -4175,7 +4175,7 @@ function logSlot(d, k, c, p) {
 function takesBlock(d, compact) {
   const a = takeAdvice(d); if (!a) return '';
   const ch = takeChoice(d), tk = takesFor(d);
-  const inp = (k, f, v, unit) => `<input type="text" inputmode="numeric" data-tka="${d}|${k}|${f}" value="${v}" style="width:58px;min-height:32px;text-align:center" aria-label="${unit}"> <span class="nx-small">${unit}</span>`;
+  const inp = (k, f, v, unit) => `<input type="text" data-tka="${d}|${k}|${f}" value="${v}" style="width:58px;min-height:32px;text-align:center" aria-label="${unit}"> <span class="nx-small">${unit}</span>`;
   const done = (k, txt) => { const l = loggedIn(d, k); if (!l.length) return ''; const m = l.reduce((x, it) => { const q = it.per100 || {}; x.c += it.g * (q.c || 0) / 100; x.p += it.g * (q.p || 0) / 100; return x; }, { c: 0, p: 0 }); return `<p class="nx-small" style="margin:6px 0 0;color:var(--good)">✓ Apuntado en tus comidas: ${Math.round(m.c)} g de hidratos${m.p >= 1 ? ' y ' + Math.round(m.p) + ' g de proteína' : ''}${txt ? ' · ' + txt : ''}.</p>`; };
   const btns = (k, on, own) => `<div class="row" style="gap:6px;margin-top:8px"><button type="button" class="chip" data-act="take" data-d="${d}" data-k="${k}" data-v="1" aria-pressed="${!!on}">Lo tomo</button><button type="button" class="chip" data-act="take" data-d="${d}" data-k="${k}" data-v="0" aria-pressed="${!on}">No lo tomo</button>${own ? `<button type="button" class="btn link" data-act="take" data-d="${d}" data-k="${k}" data-v="auto" style="font-size:12.5px">volver a lo recomendado</button>` : ''}</div>`;
   const row = (k, lab, x) => {
@@ -4212,7 +4212,7 @@ function fuelTakenDefaults(s) {
 function fuelTakenFields(s, d, dv) {
   const df = fuelTakenDefaults(s), sv = (d && d.took) || null, val = (k, def) => dv[k] ?? (sv && sv[k] != null ? sv[k] : def);
   const chk = (k, def) => (dv[k] != null ? dv[k] === true || dv[k] === 'true' : sv && sv[k] != null ? !!sv[k] : def);
-  const num = (id, k, def, ph) => `<input id="done-${id}" data-dv="${k}" type="text" inputmode="numeric" value="${esc(val(k, def) || '')}" placeholder="${ph}" style="width:72px">`;
+  const num = (id, k, def, ph) => `<input id="done-${id}" data-dv="${k}" type="text" value="${esc(val(k, def) || '')}" placeholder="${ph}" style="width:72px">`;
   return `<span class="eyebrow" style="margin-top:2px">Lo que tomaste <span class="muted" style="text-transform:none;letter-spacing:0">(se apunta en tus comidas del día; ya viene lo previsto)</span></span>
     ${df.main ? `<div class="ck-row"><label class="row" style="gap:8px"><input type="checkbox" id="done-pre-on" data-dv="preOn" ${chk('preOn', df.pre) ? 'checked' : ''}> Pre-entreno</label><span class="row nx-small" style="gap:6px">${num('pre-c', 'preC', df.preC, 'g')} g de hidratos</span></div>` : ''}
     ${s.min >= 30 ? `<div class="ck-row"><label for="done-cho">Durante<small>geles + bidones, total de hidratos</small></label><span class="row nx-small" style="gap:6px">${num('cho', 'cho', d && d.cho ? d.cho : df.cho, '0')} g</span></div>
@@ -4247,7 +4247,7 @@ function sessStats(s) {
 const distOf = s => s.sport === 'swim' ? { k: 'm', u: 'm', v: s.meters || 0, step: 50 } : s.sport === 'str' ? null : { k: 'km', u: 'km', v: s.km || 0, step: 0.01 };
 function dataFields(s, d, dv) {
   const g = actOf(s), v = (k, gk) => dv[k] ?? (d && d[k] != null ? d[k] : (g && g[gk || k] != null ? g[gk || k] : ''));
-  const inp = (id, k, lab, ph, w, help) => `<div class="ck-row"><label for="${id}">${lab}${help ? `<small>${help}</small>` : ''}</label><input id="${id}" data-dv="${k}" type="text" inputmode="numeric" placeholder="${ph}" value="${esc(v(k))}" style="width:${w}px"></div>`;
+  const inp = (id, k, lab, ph, w, help) => `<div class="ck-row"><label for="${id}">${lab}${help ? `<small>${help}</small>` : ''}</label><input id="${id}" data-dv="${k}" type="text" placeholder="${ph}" value="${esc(v(k))}" style="width:${w}px"></div>`;
   return `<span class="eyebrow" style="margin-top:2px">Datos del reloj${g ? ' · rellenados desde tu Garmin' : ''} <span class="muted" style="text-transform:none;letter-spacing:0">(opcional; con ellos la carga es más exacta que con el RPE)</span></span>
     ${inp('done-hr', 'hr', 'FC media (ppm)', 'ej. 142', 90)}${inp('done-hrx', 'hrx', 'FC máxima (ppm)', 'ej. 171', 90).replace(/value="[^"]*"/, 'value="' + esc(dv.hrx ?? (d && d.hrx != null ? d.hrx : (g && g.hrMax) || '')) + '"')}
     ${s.sport === 'bike' ? inp('done-pw', 'pw', 'Potencia media (W)', 'ej. 185', 90) + inp('done-np', 'np', 'Potencia normalizada (W)', 'ej. 198', 90, 'mejor que la media si la tienes') : ''}
@@ -4263,8 +4263,8 @@ function doneBlock(s) {
     return `<div style="display:flex;flex-direction:column;gap:10px;width:100%">
       <p class="muted" style="font-size:13.5px;margin:0">${d ? 'Corrige lo que hiciste de verdad.' : 'Anota lo que has hecho de verdad: si ha sido más o menos que lo previsto, cámbialo aquí.'} Previsto: ${s.exact && s.sec ? fmtHMS(s.sec / 60) : E.fmtHM(s.min)} h${dst && dst.v ? ' · ' + (dst.k === 'm' ? nf(dst.v, 0) : kmf(dst.v)) + ' ' + dst.u : ''}.</p>
       <div class="ck-row"><span class="lab">Esfuerzo percibido (RPE)<small>${esc(lbl[rp])}</small></span><div class="rpe">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(v => `<button type="button" data-act="rpe" data-v="${v}" aria-pressed="${v === rp}">${v}</button>`).join('')}</div></div>
-      <div class="ck-row"><label for="done-min">Duración real (h:mm:ss)</label><input id="done-min" data-dv="min" type="text" inputmode="numeric" placeholder="1:05:30" value="${esc(typeof (dv.min ?? (d ? d.min : (gA0 ? gA0.min : s.min))) === 'number' ? fmtHMS(dv.min ?? (d ? d.min : (gA0 ? gA0.min : s.min))) : dv.min)}" style="width:120px"></div>
-      ${dst ? `<div class="ck-row"><label for="done-dist">Distancia real (${dst.u})</label><input id="done-dist" data-dv="${dst.k}"  type="${dst.k === 'km' ? 'text' : 'number'}" ${dst.k === 'km' ? '' : `min="0" step="${dst.step}"`} inputmode="decimal" placeholder="${dst.k === 'km' ? 'ej. 17,9' : ''}" value="${esc(dst.k === 'km' ? String(dval).replace('.', ',') : dval)}" style="width:110px"></div>` : ''}
+      <div class="ck-row"><label for="done-min">Duración real (h:mm:ss)</label><input id="done-min" data-dv="min" type="text" placeholder="1:05:30" value="${esc(typeof (dv.min ?? (d ? d.min : (gA0 ? gA0.min : s.min))) === 'number' ? fmtHMS(dv.min ?? (d ? d.min : (gA0 ? gA0.min : s.min))) : dv.min)}" style="width:120px"></div>
+      ${dst ? `<div class="ck-row"><label for="done-dist">Distancia real (${dst.u})</label><input id="done-dist" data-dv="${dst.k}"  type="text" ${dst.k === 'km' ? '' : 'data-num="1"'} ${dst.k === 'km' ? '' : `min="0" step="${dst.step}"`} placeholder="${dst.k === 'km' ? 'ej. 17,9' : ''}" value="${esc(dst.k === 'km' ? String(dval).replace('.', ',') : dval)}" style="width:110px"></div>` : ''}
       ${s.sport !== 'str' ? dataFields(s, d, dv) : ''}
       <div class="ck-row"><label for="done-cond">Condiciones</label><select id="done-cond" data-dv="cond" style="width:auto">${[['normal', 'Normales'], ['frio', 'Frío'], ['calor', 'Calor (> 24 °C)'], ['mcalor', 'Mucho calor (> 30 °C)'], ['viento', 'Viento o lluvia']].map(([v, l]) => `<option value="${v}" ${(dv.cond ?? ((d && d.cond) || 'normal')) === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
       <div class="ck-row"><label for="done-fe">Cómo estaban las piernas</label><select id="done-fe" data-dv="fe" style="width:auto">${[['', 'Sin indicar'], [1, 'Destruidas'], [2, 'Pesadas'], [3, 'Normales'], [4, 'Buenas'], [5, 'Ligeras']].map(([v, l]) => `<option value="${v}" ${String(dv.fe ?? ((d && d.fe) || '')) === String(v) ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
@@ -4289,13 +4289,13 @@ const cleanT = v => Math.max(0, Math.round((+v || 0) * 60) / 60);
 const canStruct = sport => sport === 'bike' || sport === 'run';
 const powBox = (sc, k, P) => {
   const ftp = C.m.ftp, pc = w => ftp ? Math.round((+w || 0) / ftp * 100) : 0, ramp = P.m !== 'const';
-  const inp = (f, l) => `<label style="display:flex;flex-direction:column;gap:2px;font-size:12px" class="muted">${l}<input data-pw="${k}" data-pf="${f}" data-sc="${sc}" type="number" min="30" max="900" step="5" inputmode="numeric" value="${esc(P[f])}" style="width:84px"></label>`;
+  const inp = (f, l) => `<label style="display:flex;flex-direction:column;gap:2px;font-size:12px" class="muted">${l}<input data-pw="${k}" data-pf="${f}" data-sc="${sc}" type="text" data-num="1" min="30" max="900" step="5" value="${esc(P[f])}" style="width:84px"></label>`;
   return `<div style="grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;padding-top:8px;width:100%">
     <label style="display:flex;flex-direction:column;gap:2px;font-size:12px" class="muted">Potencia<select data-pm="${k}" data-sc="${sc}"><option value="ramp" ${ramp ? 'selected' : ''}>Rampa (cambia con el tiempo)</option><option value="const" ${ramp ? '' : 'selected'}>Constante</option></select></label>
     ${ramp ? inp('a', 'Al empezar (W)') + inp('b', 'Al terminar (W)') : inp('a', 'Vatios')}
     <span class="muted" data-pwh="${k}" data-sc="${sc}" style="font-size:12.5px;padding-bottom:8px">${powHint(P)}</span></div>`;
 };
-const tbox = (sc, k, label, v, P) => `<div class="row" style="gap:10px;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:10px;flex-wrap:wrap"><label style="display:flex;gap:8px;align-items:center;font-size:14px;font-weight:600;flex:1;cursor:pointer"><input type="checkbox" data-sw="${k}" data-sc="${sc}" ${v > 0 ? 'checked' : ''} style="width:20px;height:20px">${label}</label>${v > 0 ? `<span style="display:flex;align-items:center;gap:6px"><input data-swm="${k}" data-sc="${sc}" type="text" inputmode="numeric" placeholder="0:10:00" value="${fmtHMS(v)}" style="width:96px" aria-label="Tiempo de ${label.toLowerCase()} (h:mm:ss)"><span class="muted" style="font-size:13px">h:mm:ss</span></span>` : ''}${v > 0 && P ? powBox(sc, k, P) : ''}</div>`;
+const tbox = (sc, k, label, v, P) => `<div class="row" style="gap:10px;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:10px;flex-wrap:wrap"><label style="display:flex;gap:8px;align-items:center;font-size:14px;font-weight:600;flex:1;cursor:pointer"><input type="checkbox" data-sw="${k}" data-sc="${sc}" ${v > 0 ? 'checked' : ''} style="width:20px;height:20px">${label}</label>${v > 0 ? `<span style="display:flex;align-items:center;gap:6px"><input data-swm="${k}" data-sc="${sc}" type="text" placeholder="0:10:00" value="${fmtHMS(v)}" style="width:96px" aria-label="Tiempo de ${label.toLowerCase()} (h:mm:ss)"><span class="muted" style="font-size:13px">h:mm:ss</span></span>` : ''}${v > 0 && P ? powBox(sc, k, P) : ''}</div>`;
 const rowHint = r => {
   const pa = +r.pa > 0, pb = +r.pb > 0, own = pa || pb || +r.ps > 0, rng = pa && pb;
   if (rng) return `Entrenas entre ${E.fmtPace(Math.min(r.pa, r.pb))} y ${E.fmtPace(Math.max(r.pa, r.pb))} /km. El ritmo objetivo (la media) es <b>${E.fmtPace(E.rowPace(r))} /km</b>${+r.d > 0 ? ' y con él se calcula el tiempo de cada serie.' : '.'}`;
@@ -4323,14 +4323,14 @@ function structEditor(sc, o) {
     ${tbox(sc, 'wu', 'Calentamiento', wu, sport === 'bike' ? getP(o, 'wu') : null)}
     ${rows.map((r, i) => `<div class="card pad-s" style="padding:12px;background:var(--surface-2)"><div class="row sb" style="margin-bottom:8px"><span class="eyebrow">Bloque ${i + 1}</span>${rows.length > 1 ? `<button type="button" class="btn link" data-act="st-del" data-sc="${sc}" data-i="${i}">Quitar</button>` : ''}</div>
       <div class="fgrid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
-        <div class="field"><label for="${sc}-n${i}">Series</label><input id="${sc}-n${i}" data-sr="n" data-sc="${sc}" data-i="${i}" type="number" min="1" max="60" inputmode="numeric" value="${esc(r.n)}"></div>
-        ${sport === 'run' ? `<div class="field"><label for="${sc}-d${i}">Distancia de cada una (km)</label><input id="${sc}-d${i}" data-sr="d" data-sc="${sc}" data-i="${i}" type="text" inputmode="decimal" placeholder="opcional · ej. 17,9" value="${+r.d > 0 ? esc(String(r.d).replace('.', ',')) : ''}"></div>` : ''}
-        <div class="field"><label for="${sc}-m${i}">Tiempo de cada una (h:mm:ss)</label><input id="${sc}-m${i}" ${+r.d > 0 ? 'readonly' : 'data-sr="min"'} data-sc="${sc}" data-i="${i}" type="text" inputmode="numeric" placeholder="0:08:00" value="${+r.d > 0 ? '≈ ' + fmtHMS(E.rowMin(r, C.m)) + ' (por distancia y ritmo)' : fmtHMS(r.min)}"></div>
+        <div class="field"><label for="${sc}-n${i}">Series</label><input id="${sc}-n${i}" data-sr="n" data-sc="${sc}" data-i="${i}" type="text" data-num="1" min="1" max="60" value="${esc(r.n)}"></div>
+        ${sport === 'run' ? `<div class="field"><label for="${sc}-d${i}">Distancia de cada una (km)</label><input id="${sc}-d${i}" data-sr="d" data-sc="${sc}" data-i="${i}" type="text" placeholder="opcional · ej. 17,9" value="${+r.d > 0 ? esc(String(r.d).replace('.', ',')) : ''}"></div>` : ''}
+        <div class="field"><label for="${sc}-m${i}">Tiempo de cada una (h:mm:ss)</label><input id="${sc}-m${i}" ${+r.d > 0 ? 'readonly' : 'data-sr="min"'} data-sc="${sc}" data-i="${i}" type="text" placeholder="0:08:00" value="${+r.d > 0 ? '≈ ' + fmtHMS(E.rowMin(r, C.m)) + ' (por distancia y ritmo)' : fmtHMS(r.min)}"></div>
         <div class="field" style="grid-column:1/-1"><label for="${sc}-z${i}">${zl}</label><select id="${sc}-z${i}" data-sr="z" data-sc="${sc}" data-i="${i}">${zs.map(([k, l]) => `<option value="${k}" ${r.z === k ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></div>
         ${sport === 'run' ? `<div class="field"><label for="${sc}-pa${i}">Ritmo más rápido (min/km)</label><input id="${sc}-pa${i}" data-sr="pa" data-sc="${sc}" data-i="${i}" type="text" inputmode="text" placeholder="opcional · ej. 4:20" value="${(r.pa || r.ps) > 0 ? E.fmtPace(r.pa || r.ps) : ''}"></div>
         <div class="field"><label for="${sc}-pb${i}">Ritmo más lento (min/km)</label><input id="${sc}-pb${i}" data-sr="pb" data-sc="${sc}" data-i="${i}" type="text" inputmode="text" placeholder="opcional · ej. 4:40" value="${+r.pb > 0 ? E.fmtPace(r.pb) : ''}"></div>
-        <p id="${sc}-ph${i}" class="muted" style="grid-column:1/-1;margin:0;font-size:12.5px" ${rowHint(r) ? '' : 'hidden'}>${rowHint(r)}</p>` : `<div class="field"><label for="${sc}-w${i}">Potencia propia (W)</label><input id="${sc}-w${i}" data-sr="w" data-sc="${sc}" data-i="${i}" type="number" min="30" max="1500" step="5" inputmode="numeric" placeholder="opcional" value="${+r.w > 0 ? esc(r.w) : ''}"></div>`}
-        <div class="field"><label for="${sc}-r${i}">Descanso entre series (h:mm:ss)</label><input id="${sc}-r${i}" data-sr="rest" data-sc="${sc}" data-i="${i}" type="text" inputmode="numeric" placeholder="0:02:00" value="${fmtHMS(r.rest || 0)}"></div></div></div>`).join('')}
+        <p id="${sc}-ph${i}" class="muted" style="grid-column:1/-1;margin:0;font-size:12.5px" ${rowHint(r) ? '' : 'hidden'}>${rowHint(r)}</p>` : `<div class="field"><label for="${sc}-w${i}">Potencia propia (W)</label><input id="${sc}-w${i}" data-sr="w" data-sc="${sc}" data-i="${i}" type="text" data-num="1" min="30" max="1500" step="5" placeholder="opcional" value="${+r.w > 0 ? esc(r.w) : ''}"></div>`}
+        <div class="field"><label for="${sc}-r${i}">Descanso entre series (h:mm:ss)</label><input id="${sc}-r${i}" data-sr="rest" data-sc="${sc}" data-i="${i}" type="text" placeholder="0:02:00" value="${fmtHMS(r.rest || 0)}"></div></div></div>`).join('')}
     <div><button type="button" class="btn ghost small" data-act="st-add" data-sc="${sc}">+ Añadir bloque</button></div>
     ${tbox(sc, 'cd', 'Vuelta a la calma (enfriamiento)', cd, sport === 'bike' ? getP(o, 'cd') : null)}
     <div class="row" style="justify-content:flex-end"><span class="muted" style="font-size:13.5px">Total: <b id="${sc}-tot" class="num">${fmtHMS(E.structTotal(rows, wu, cd, C.m))}</b> h:mm:ss</span></div></div>`;
@@ -4351,7 +4351,7 @@ function planActions(s) {
     return `<div style="padding:0 20px 18px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);margin-top:2px"><p class="muted" style="font-size:13.5px;margin:12px 0 0">Cambia lo que vas a hacer. ${regen ? 'La sesión se rehace con la nueva duración y sus zonas.' : 'Esta sesión solo se puede mover de día.'}</p>
       <div class="fgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
         <div class="field"><label for="ef-date">Día</label><input id="ef-date" data-ef="date" type="date" value="${esc(ef.date)}" min="${TODAY}"></div>
-        ${regen ? `${ef.struct ? '' : `<div class="field"><label for="ef-min">Duración (h:mm:ss)</label><input id="ef-min" data-ef="min" type="text" inputmode="numeric" placeholder="1:00:00" value="${esc(typeof ef.min === 'number' ? fmtHMS(ef.min) : ef.min)}"></div>`}
+        ${regen ? `${ef.struct ? '' : `<div class="field"><label for="ef-min">Duración (h:mm:ss)</label><input id="ef-min" data-ef="min" type="text" placeholder="1:00:00" value="${esc(typeof ef.min === 'number' ? fmtHMS(ef.min) : ef.min)}"></div>`}
         <div class="field" style="grid-column:1/-1"><label for="ef-sport">Deporte</label><select id="ef-sport" data-ef="sport">${[['run', 'Carrera a pie'], ['bike', 'Ciclismo'], ['swim', 'Natación']].map(([k, l]) => `<option value="${k}" ${ef.sport === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
         ${structEditor('ef', ef)}` : ''}</div>
       <div class="row" style="gap:10px"><button class="btn" data-act="sess-edit-save" data-id="${esc(s.id)}">Guardar cambios</button><button class="btn ghost" data-act="sess-edit-cancel">Cancelar</button></div></div>`;
@@ -4384,8 +4384,8 @@ function extraCard() {
     <div class="fgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
       <div class="field"><label for="xf-date">Día</label><input id="xf-date" data-xf="date" type="date" value="${esc(x.date)}" ${x.status === 'plan' ? `min="${TODAY}" max="${E.addDays(TODAY, 90)}"` : `max="${TODAY}" min="${E.addDays(TODAY, -30)}"`}></div>
       <div class="field"><label for="xf-sport">Deporte</label><select id="xf-sport" data-xf="sport">${[['run', 'Carrera a pie'], ['bike', 'Ciclismo'], ['swim', 'Natación'], ['str', 'Fuerza']].map(([k, l]) => `<option value="${k}" ${x.sport === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
-      ${x.struct ? '' : `<div class="field"><label for="xf-min">Duración (h:mm:ss)</label><input id="xf-min" data-xf="min" type="text" inputmode="numeric" value="${esc(typeof x.min === 'number' ? fmtHMS(x.min) : x.min)}" placeholder="1:00:00"></div>`}
-      ${x.sport === 'str' ? '' : `<div class="field"><label for="xf-dist">Distancia (${x.sport === 'swim' ? 'm' : 'km'})</label><input id="xf-dist" data-xf="dist" type="text" inputmode="decimal" value="${esc(x.dist)}" placeholder="${x.sport === 'swim' ? '1500' : 'ej. 17,9'}"></div>`}
+      ${x.struct ? '' : `<div class="field"><label for="xf-min">Duración (h:mm:ss)</label><input id="xf-min" data-xf="min" type="text" value="${esc(typeof x.min === 'number' ? fmtHMS(x.min) : x.min)}" placeholder="1:00:00"></div>`}
+      ${x.sport === 'str' ? '' : `<div class="field"><label for="xf-dist">Distancia (${x.sport === 'swim' ? 'm' : 'km'})</label><input id="xf-dist" data-xf="dist" type="text" value="${esc(x.dist)}" placeholder="${x.sport === 'swim' ? '1500' : 'ej. 17,9'}"></div>`}
       ${structEditor('xf', x)}
       <div class="field" style="grid-column:1/-1"><label for="xf-title">Nombre (opcional)</label><input id="xf-title" data-xf="title" type="text" value="${esc(x.title)}" placeholder="Rodaje por el parque"></div></div>
     ${x.status === 'plan' ? '' : `<div class="ck-row" style="margin-top:10px"><span class="lab">Esfuerzo percibido (RPE)<small>${esc(lbl[x.rpe])}</small></span><div class="rpe">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(v => `<button type="button" data-act="xf-rpe" data-v="${v}" aria-pressed="${v === x.rpe}">${v}</button>`).join('')}</div></div>`}
@@ -4736,7 +4736,7 @@ function dayTimeline(d, bare) {
   return `<section class="${bare ? "" : "card pad-s"}" aria-label="Tu día hora a hora"><div class="row sb" style="align-items:baseline"><span class="eyebrow">Tu día, hora a hora · ${esc(E.fmtFechaC(d))}</span>${own ? `<button type="button" class="btn link" data-act="dt-reset" data-d="${d}" style="font-size:12.5px">volver a mi horario habitual</button>` : ''}</div>
     <p class="nx-small muted" style="margin:4px 0 6px">Toca una hora para cambiarla: el resto del día se recoloca. <b>✓</b> tomado · <b>×</b> no tomado.</p>
     <div class="tl">${items.map(it => `<div class="tl-row${it.kind === 'ses' ? ' tl-ses' : ''}${it.no ? ' tl-no' : ''}${it.logged ? ' tl-ok' : ''}${(nowM >= 0 && (it.end || it.t + 20) < nowM) || it.done ? ' tl-past' : ''}">
-      <div class="tl-t">${it.inp ? `<input type="text" inputmode="numeric" maxlength="5" ${it.inp} value="${m2hm(it.t)}" aria-label="Hora de ${esc(it.name)}">` : `<span>${m2hm(it.t)}</span>`}</div>
+      <div class="tl-t">${it.inp ? `<input type="text" maxlength="5" ${it.inp} value="${m2hm(it.t)}" aria-label="Hora de ${esc(it.name)}">` : `<span>${m2hm(it.t)}</span>`}</div>
       <div class="tl-c"><span class="tl-ic" aria-hidden="true">${it.ic}</span><div><b>${esc(it.name)}</b>${it.sub ? `<small${it.subCls ? ` style="color:var(--${it.subCls})"` : ''}>${esc(it.sub)}</small>` : ''}</div></div>
       <div class="tl-a">${it.ok ? `<button type="button" class="tl-b tl-y" data-act="dt-ok" data-d="${d}" data-k="${esc(it.ok)}" aria-pressed="${!!it.logged}" aria-label="Tomado: ${esc(it.name)}">✓</button>` : ''}${it.del ? `<button type="button" class="tl-b tl-x" data-act="dt-skip" data-d="${d}" data-k="${esc(it.del)}" aria-label="No tomado: ${esc(it.name)}">×</button>` : ''}</div>
     </div>`).join('')}</div>
@@ -4919,14 +4919,14 @@ function checkinCard() {
   const seg = (k, lbls) => `<div class="seg" role="group">${[1, 2, 3, 4, 5].map(v => `<button type="button" data-act="ck-set" data-k="${k}" data-v="${v}" aria-pressed="${+d[k] === v}" title="${esc(lbls[v - 1])}">${v}</button>`).join('')}</div>`;
   return `<section class="card"><div class="card-h"><h2>¿Cómo estás hoy?</h2><span class="muted" style="font-size:13px">30 segundos</span></div>
     <div class="ck">
-      <div class="ck-row"><label for="ck-sueno">Horas de sueño</label><input id="ck-sueno" data-ck="sueno" type="text" inputmode="numeric" placeholder="7:30:00" value="${esc(sleepTxt(d.sueno))}" style="width:110px"></div>
+      <div class="ck-row"><label for="ck-sueno">Horas de sueño</label><input id="ck-sueno" data-ck="sueno" type="text" placeholder="7:30:00" value="${esc(sleepTxt(d.sueno))}" style="width:110px"></div>
       <div class="ck-row"><span class="lab">Calidad del sueño<small>1 muy mala · 5 excelente</small></span>${seg('calidad', ['Muy mala', 'Mala', 'Normal', 'Buena', 'Excelente'])}</div>
       <div class="ck-row"><span class="lab">Fatiga general<small>1 fresco · 5 agotado</small></span>${seg('fatiga', ['Fresco', 'Bien', 'Normal', 'Cansado', 'Agotado'])}</div>
       <div class="ck-row"><span class="lab">Dolor muscular<small>1 nada · 5 mucho</small></span>${seg('dolor', ['Nada', 'Poco', 'Algo', 'Bastante', 'Mucho'])}</div>
       <div class="ck-row"><span class="lab">Estrés fuera del deporte<small>1 nada · 5 mucho</small></span>${seg('estres', ['Nada', 'Poco', 'Normal', 'Alto', 'Muy alto'])}</div>
       <div class="ck-row"><span class="lab">¿Síntomas de enfermedad?</span><div class="seg wide" role="group">${[['no', 'No'], ['cuello', 'Resfriado leve'], ['fiebre', 'Fiebre o pecho']].map(([v, l]) => `<button type="button" data-act="ck-set" data-k="enfermo" data-v="${v}" aria-pressed="${d.enfermo === v}">${l}</button>`).join('')}</div></div>
       <div class="ck-row"><span class="lab">Dolor localizado o molestia de lesión</span><div class="seg wide" role="group"><button type="button" data-act="ck-set" data-k="lesion" data-v="0" aria-pressed="${!d.lesion}">No</button><button type="button" data-act="ck-set" data-k="lesion" data-v="1" aria-pressed="${!!d.lesion}">Sí</button></div></div>
-      <div class="fgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div class="field"><label for="ck-vfc">VFC hoy (ms)</label><input id="ck-vfc" data-ck="vfc" type="number" min="10" max="200" value="${esc(d.vfc)}" placeholder="opcional"><small>Tu media: ${C.p.vfcBase || '—'}</small></div><div class="field"><label for="ck-fcr">FC en reposo</label><input id="ck-fcr" data-ck="fcr" type="number" min="30" max="110" value="${esc(d.fcr)}" placeholder="opcional"><small>Tu media: ${C.p.fcrBase || '—'}</small></div></div>
+      <div class="fgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div class="field"><label for="ck-vfc">VFC hoy (ms)</label><input id="ck-vfc" data-ck="vfc" type="text" data-num="1" min="10" max="200" value="${esc(d.vfc)}" placeholder="opcional"><small>Tu media: ${C.p.vfcBase || '—'}</small></div><div class="field"><label for="ck-fcr">FC en reposo</label><input id="ck-fcr" data-ck="fcr" type="text" data-num="1" min="30" max="110" value="${esc(d.fcr)}" placeholder="opcional"><small>Tu media: ${C.p.fcrBase || '—'}</small></div></div>
       <div class="row"><button class="btn" data-act="ck-save">Ver mi estado</button>${c ? '<button class="btn ghost" data-act="ck-cancel">Cancelar</button>' : ''}</div>
     </div></section>`;
 }
@@ -5280,8 +5280,8 @@ function pastRace(r, q) {
   const fi = (k, l, ph, extra) => `<div class="field"><label for="rs-${k}">${l}</label><input id="rs-${k}" data-rs="${k}" type="text" value="${esc(v[k])}" placeholder="${ph}" ${extra || ''}></div>`;
   return h + `<div class="stack" style="gap:10px;margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:12px">
     <div class="fgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
-      ${fi('tiempo', 'Tiempo final', 'h:mm:ss', 'inputmode="numeric"')}${fi('km', 'Distancia real (km)', nf(raceKm(r), 1), 'inputmode="decimal"')}
-      ${fi('fc', 'FC media (ppm)', 'ej. 168', 'inputmode="numeric"')}${fi('puesto', 'Puesto (opcional)', 'ej. 152/1.300')}
+      ${fi('tiempo', 'Tiempo final', 'h:mm:ss', '')}${fi('km', 'Distancia real (km)', nf(raceKm(r), 1), '')}
+      ${fi('fc', 'FC media (ppm)', 'ej. 168', '')}${fi('puesto', 'Puesto (opcional)', 'ej. 152/1.300')}
     </div>
     ${fi('parciales', r.disciplina === 'running' ? 'Parciales por km (opcional)' : 'Parciales por tramo (opcional)', 'ej. 4:32, 4:28, 4:30, 4:35…')}
     <div class="field"><label>Sensaciones</label><div class="seg wide">${[1, 2, 3, 4, 5].map(n => `<button type="button" data-act="rs-set" data-k="sens" data-v="${n}" aria-pressed="${+v.sens === n}">${sens[n]}</button>`).join('')}</div></div>
@@ -5378,7 +5378,7 @@ function raceForm() {
   const evs = Object.entries(E.EVENTS[f.disciplina]).map(([k, v]) => [k, v.n]).concat(f.disciplina === 'running' ? [RUN_OTRA] : []);
   if (!evs.some(([k]) => k === f.prueba)) f.prueba = evs[0][0];
   const sel = (k, opts) => `<select id="rf-${k}" data-rf="${k}">${opts.map(([v, l]) => `<option value="${esc(v)}" ${String(f[k]) === String(v) ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`;
-  const inp = (k, type, attrs) => `<input id="rf-${k}" data-rf="${k}" type="${type}" value="${esc(f[k] ?? '')}" ${attrs || ''}>`;
+  const inp = (k, type, attrs) => `<input id="rf-${k}" data-rf="${k}" type="${type === 'number' ? 'text" data-num="1' : type}" value="${esc(f[k] ?? '')}" ${attrs || ''}>`;
   const needDist = f.disciplina === 'ciclismo' || (f.disciplina === 'running' && f.prueba === 'otra');
   const isSwim = f.disciplina === 'natacion';
   return `<section class="card" aria-label="${UI.rfEdit ? 'Editar prueba' : 'Nueva prueba'}"><div class="card-h"><h2>${UI.rfEdit ? 'Editar prueba' : 'Nueva prueba'}</h2></div>
@@ -5404,7 +5404,7 @@ function raceForm() {
     <div class="fsec" style="padding-bottom:0">
       <div class="ck-row"><span class="lab">Prioridad<small>${esc(E.PRIO[f.prioridad].d)}</small></span><div class="seg wide" role="group" aria-label="Prioridad">${['A', 'B', 'C'].map(k => `<button type="button" data-act="rf-set" data-k="prioridad" data-v="${k}" aria-pressed="${f.prioridad === k}">${k}</button>`).join('')}</div></div>
       <div class="ck-row"><span class="lab">Objetivo</span><div class="seg wide" role="group" aria-label="Objetivo">${[['terminar', 'Terminar'], ['tiempo', 'Tiempo'], ['otro', 'Otro']].map(([k, l]) => `<button type="button" data-act="rf-set" data-k="objetivo" data-v="${k}" aria-pressed="${f.objetivo === k}">${l}</button>`).join('')}</div></div>
-      ${f.objetivo === 'tiempo' ? `<div class="field"><label for="rf-objetivoTiempo">Tiempo objetivo</label>${inp('objetivoTiempo', 'text', 'placeholder="h:mm:ss o mm:ss" inputmode="numeric" style="max-width:200px"')}<small>Compruebo si es realista con tu forma actual</small></div>` : ''}
+      ${f.objetivo === 'tiempo' ? `<div class="field"><label for="rf-objetivoTiempo">Tiempo objetivo</label>${inp('objetivoTiempo', 'text', 'placeholder="h:mm:ss o mm:ss" style="max-width:200px"')}<small>Compruebo si es realista con tu forma actual</small></div>` : ''}
       ${f.objetivo === 'tiempo' ? `<div class="field"><label for="rf-margen">Margen aceptable (%)</label>${inp('margen', 'number', 'step="0.5" min="0" max="20" placeholder="auto"')}<small>Opcional. Vacío: según la distancia (10K 2,5 %, media 3,5 %, maratón 4,5 %).</small></div>` : ''}
       ${f.objetivo === 'otro' ? `<div class="field"><label for="rf-objetivoTexto">Describe tu objetivo</label>${inp('objetivoTexto', 'text', 'placeholder="Ej.: top 10 de mi categoría" maxlength="100"')}</div>` : ''}
     </div>
@@ -5876,7 +5876,7 @@ function nxSlot(d, s, t, R) {
     if (it.grp && it.grp !== lastG) h += `<div class="nx-grp">${esc(it.grp)}</div>`; lastG = it.grp || null;
     const mm = itemM(it), step = it.g < 30 ? 5 : 10;
     h += `<div class="nx-irow"><button class="nx-iname" data-act="nx-edit" data-s="${s.key}" data-i="${i}">${issuesBadge(it, R)}${esc(it.name)}</button>
-      <span class="nx-iqty"><button data-act="nx-step" data-s="${s.key}" data-i="${i}" data-v="-${step}" aria-label="Quitar ${step} g">−</button><input class="nx-qty" data-s="${s.key}" data-i="${i}" type="number" inputmode="decimal" min="0" step="${step}" value="${r0n(it.g)}" aria-label="Gramos de ${esc(it.name)}"><button data-act="nx-step" data-s="${s.key}" data-i="${i}" data-v="${step}" aria-label="Añadir ${step} g">+</button></span>
+      <span class="nx-iqty"><button data-act="nx-step" data-s="${s.key}" data-i="${i}" data-v="-${step}" aria-label="Quitar ${step} g">−</button><input class="nx-qty" data-s="${s.key}" data-i="${i}" type="text" data-num="1" min="0" step="${step}" value="${r0n(it.g)}" aria-label="Gramos de ${esc(it.name)}"><button data-act="nx-step" data-s="${s.key}" data-i="${i}" data-v="${step}" aria-label="Añadir ${step} g">+</button></span>
       <span class="nx-ik" id="nk-${esc(it.id)}">${nfk(mm.kcal)} kcal · ${nfk(mm.c)} HC · ${nfk(mm.p)} P · ${nfk(mm.f)} G</span>
       <button class="nx-idel" data-act="nx-del" data-s="${s.key}" data-i="${i}">Quitar</button></div>`;
   });
@@ -5984,7 +5984,7 @@ function calcSweatRec(x) {
 function sweatCard() {
   const ks = Object.keys(S.sweat || {}).sort().reverse();
   const s = UI.sw || {};
-  const f = (k, l, ph, step) => `<div class="field"><label for="sw-${k}">${l}</label><input id="sw-${k}" data-swf="${k}" type="number" step="${step || 1}" value="${esc(s[k] ?? '')}" placeholder="${ph}"></div>`;
+  const f = (k, l, ph, step) => `<div class="field"><label for="sw-${k}">${l}</label><input id="sw-${k}" data-swf="${k}" type="text" data-num="1" step="${step || 1}" value="${esc(s[k] ?? '')}" placeholder="${ph}"></div>`;
   let h = `<section class="card"><div class="card-h"><h2>Tasa de sudoración</h2></div>
     <p class="nx-small muted" style="font-size:13px;margin:0 0 10px">Pésate desnudo antes y después, seco con la toalla, y apunta lo que bebas y lo que orines durante. Con 3 o 4 mediciones por condición ya tienes un perfil fiable, y cuanto más se parezcan el calor y el ritmo a los de la prueba, mejor.</p>
     <div class="fgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
@@ -6153,7 +6153,7 @@ function fuelTally(d) {
       ${row(`<i class="nx-key" style="background:var(--cho)"></i> Bidones (${d.bidones} × ${d.cb} g)`, '−' + powC + ' g')}
       ${ok ? row('Te falta', '0 g · cubierto ✓', 'color:var(--good)') : diff > 0 ? row('Te faltan', diff + ' g', 'color:var(--warn)') : row('Te pasas', '+' + (-diff) + ' g', 'color:var(--warn)')}
     </div>
-    <div class="row" style="justify-content:space-between;font-size:14px;margin:8px 0 0"><span>Hidratos en cada bidón${UI.dk.cb != null && UI.dk.cb !== d.cbAuto ? ` <button type="button" class="btn link" data-act="nx-dkReset2" data-k="cb" style="font-size:12.5px">auto: ${d.cbAuto} g</button>` : ''}</span><span class="row" style="gap:6px"><button type="button" class="chip" data-act="nx-dkAdj" data-k="cb" data-v="-5" aria-label="Bajar 5 g">−</button><input type="number" inputmode="numeric" min="0" max="200" step="1" data-dkcb="1" value="${d.cb}" style="width:68px;min-height:34px;text-align:center" aria-label="Gramos de hidratos por bidón"> g<button type="button" class="chip" data-act="nx-dkAdj" data-k="cb" data-v="5" aria-label="Subir 5 g">+</button></span></div>
+    <div class="row" style="justify-content:space-between;font-size:14px;margin:8px 0 0"><span>Hidratos en cada bidón${UI.dk.cb != null && UI.dk.cb !== d.cbAuto ? ` <button type="button" class="btn link" data-act="nx-dkReset2" data-k="cb" style="font-size:12.5px">auto: ${d.cbAuto} g</button>` : ''}</span><span class="row" style="gap:6px"><button type="button" class="chip" data-act="nx-dkAdj" data-k="cb" data-v="-5" aria-label="Bajar 5 g">−</button><input type="text" data-num="1" min="0" max="200" step="1" data-dkcb="1" value="${d.cb}" style="width:68px;min-height:34px;text-align:center" aria-label="Gramos de hidratos por bidón"> g<button type="button" class="chip" data-act="nx-dkAdj" data-k="cb" data-v="5" aria-label="Subir 5 g">+</button></span></div>
     ${ok ? '' : `<button type="button" class="btn small ghost" data-act="nx-dkFit" style="margin-top:8px">Ajustar los bidones a lo que falta</button>`}
     <p class="nx-small muted" style="margin:6px 0 0">Cada bidón lleva los gramos que fijes aquí. Si quitas o pones bidones o geles, el total cubierto sube o baja y verás cuánto te falta o te sobra.</p></div>`;
 }
@@ -6227,9 +6227,9 @@ function fuelCard() {
     <div class="row" style="gap:6px;flex-wrap:wrap">${ss.map((x, i) => `<button type="button" class="chip" data-act="nx-dkSes" data-v="${i}" aria-pressed="${i === Math.min(UI.dk.ses, ss.length - 1)}">${SPN[x.sport]} · ${esc((x.title || SPN[x.sport]).slice(0, 22))}, ${x.min} min</button>`).join('')}</div>
     ${ss[0].manual ? `<div class="fgrid" style="grid-template-columns:repeat(2,minmax(0,1fr));margin-top:10px">
       <div class="field"><label for="dk-sp">Deporte</label><select id="dk-sp" data-dkm="sport">${['bike', 'run', 'swim'].map(k => `<option value="${k}" ${UI.dk.manual.sport === k ? 'selected' : ''}>${SPN[k]}</option>`).join('')}</select></div>
-      <div class="field"><label for="dk-min">Duración (min)</label><input id="dk-min" type="number" value="${UI.dk.manual.min}" data-dkm="min"></div>
-      <div class="field"><label for="dk-bid">Bidón (ml)</label><input id="dk-bid" type="number" value="${UI.dk.bidon}" data-dkbid="1"></div></div>`
-      : `<div class="nx-small muted" style="margin-top:10px">Bidón de <input type="number" value="${UI.dk.bidon}" data-dkbid="1" style="width:80px;display:inline-block;padding:4px 8px;min-height:30px"> ml</div>`}
+      <div class="field"><label for="dk-min">Duración (min)</label><input id="dk-min" type="text" data-num="1" value="${UI.dk.manual.min}" data-dkm="min"></div>
+      <div class="field"><label for="dk-bid">Bidón (ml)</label><input id="dk-bid" type="text" data-num="1" value="${UI.dk.bidon}" data-dkbid="1"></div></div>`
+      : `<div class="nx-small muted" style="margin-top:10px">Bidón de <input type="text" data-num="1" value="${UI.dk.bidon}" data-dkbid="1" style="width:80px;display:inline-block;padding:4px 8px;min-height:30px"> ml</div>`}
     <p class="nx-small muted" style="margin-top:10px">Proporción maltodextrina : fructosa</p>
     <div class="row" style="gap:6px">${['2:1', '1:0.8'].map(r => `<button type="button" class="chip" data-act="nx-dkRatio" data-v="${r}" aria-pressed="${UI.dk.ratio === r}">${r.replace('.', ',')}</button>`).join('')}</div>
     <div id="dk-out">${fuelOut()}</div>
@@ -6343,7 +6343,7 @@ function drawAdd() {
   }
   if (st.mode === 'codigo') body = `<p class="nx-small">Haz una foto al código de barras. Si el producto ya está en tus alimentos se añade directo; si es nuevo, intento buscarlo en Open Food Facts (puede estar bloqueado en este entorno) o lees la etiqueta con una foto.</p>
     <label class="btn" style="width:100%;margin-top:8px">Foto del código<input type="file" accept="image/*" capture="environment" hidden data-nxfile="barcode"></label>
-    <label class="nx-f" for="nx-bc">O escribe el número</label><div class="row" style="gap:8px"><input class="nx-t" id="nx-bc" inputmode="numeric" placeholder="8410000000000" style="flex:1"><button class="btn ghost" data-act="nx-bc">Buscar</button></div>
+    <label class="nx-f" for="nx-bc">O escribe el número</label><div class="row" style="gap:8px"><input class="nx-t" id="nx-bc" placeholder="8410000000000" style="flex:1"><button class="btn ghost" data-act="nx-bc">Buscar</button></div>
     <div id="nx-bcs" class="nx-status" role="status"></div>${offBox()}`;
   if (st.mode === 'foto') body = sampleFn ? `<p class="nx-small">Foto del plato o una descripción («lentejas con chorizo, un plato hondo»). Estimo alimentos y gramos y tú los corriges. Tengo en cuenta tus alergias.</p>
     ${st.imgOk !== false ? `<label class="btn ghost" style="width:100%;margin-top:8px">Elegir o hacer foto<input type="file" accept="image/*" hidden data-nxfile="photo"></label><div class="nx-small muted" id="nx-phn" style="margin-top:6px">${st.photo ? 'Foto lista: ' + esc(st.photo.name || 'imagen') : ''}</div>` : ''}
@@ -6361,7 +6361,7 @@ function qtySheet(food, opts) {
   const warn = is.hard.length || is.traces.length ? `<div class="nx-alert">No apto para ti: ${esc(is.hard.concat(is.traces.map(t => 'puede contener ' + t)).join(', '))}. Revisa la etiqueta antes de comerlo.</div>` : is.soft.length ? `<div class="nx-alert soft">Con cuidado: ${esc(is.soft.join(', '))}.</div>` : '';
   openSheet(`<h3 class="nx-h3">${esc(food.name)}</h3>${food.brand ? `<p class="nx-small muted">${esc(food.brand)}</p>` : ''}${warn}
     ${slotSelect(UI.sheet.slot)}
-    <label class="nx-f" for="nx-g">Cantidad (g)</label><input class="nx-t num" id="nx-g" type="number" inputmode="decimal" min="0" value="${g}" style="font-size:22px">
+    <label class="nx-f" for="nx-g">Cantidad (g)</label><input class="nx-t num" id="nx-g" type="text" data-num="1" min="0" value="${g}" style="font-size:22px">
     <input type="range" id="nx-gr" min="0" max="${Math.max(400, g * 2)}" step="5" value="${g}" aria-label="Cantidad en gramos" style="width:100%;accent-color:var(--cho)">
     <div class="row" style="gap:6px;flex-wrap:wrap">${[25, 50, 100, 150, 200, 250].map(x => `<button class="chip" data-act="nx-gq" data-v="${x}">${x} g</button>`).join('')}${food.serving ? `<button class="chip" data-act="nx-gq" data-v="${food.serving}">${esc(food.servingTxt || '1 ración')} (${food.serving} g)</button>` : ''}</div>
     <div class="nx-preview" id="nx-pv"></div>
@@ -6387,7 +6387,7 @@ function recipeSheet(r) {
     <label class="nx-f" for="nx-rf">Escalar toda la receta: <b id="nx-rfv">1</b>×</label><input type="range" id="nx-rf" min="0.5" max="2" step="0.05" value="1" style="width:100%;accent-color:var(--cho)">
     ${tgt.kcal ? `<button class="chip" data-act="nx-auto">Ajustar a tu objetivo de esta comida (${String(auto).replace('.', ',')}×)</button>` : ''}
     <p class="nx-small muted" style="margin-top:10px">Cambia los gramos de cualquier ingrediente si tu receta varía. Pon 0 para quitarlo.</p>
-    <div id="nx-ring">${UI.sheet.items.map((i, n) => `<div class="row" style="justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--line)"><span class="nx-small" style="flex:1">${esc(E.FOODDB[i.fid].name)}</span><input class="nx-t num nx-ri" data-i="${n}" type="number" inputmode="decimal" step="5" min="0" value="${i.g}" style="width:92px" aria-label="Gramos de ${esc(E.FOODDB[i.fid].name)}"><span class="nx-small muted">g</span></div>`).join('')}</div>
+    <div id="nx-ring">${UI.sheet.items.map((i, n) => `<div class="row" style="justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--line)"><span class="nx-small" style="flex:1">${esc(E.FOODDB[i.fid].name)}</span><input class="nx-t num nx-ri" data-i="${n}" type="text" data-num="1" step="5" min="0" value="${i.g}" style="width:92px" aria-label="Gramos de ${esc(E.FOODDB[i.fid].name)}"><span class="nx-small muted">g</span></div>`).join('')}</div>
     <div class="nx-preview" id="nx-pvr"></div>${tgt.kcal ? `<p class="nx-small muted" id="nx-pvt"></p>` : ''}
     <button class="btn" style="width:100%" data-act="nx-rok">Añadir receta</button>`);
   updRecipe();
@@ -6418,11 +6418,11 @@ function customSheet(pref) {
     ${pref.notes ? `<p class="nx-small">${esc(pref.notes)}</p>` : ''}
     <label class="nx-f" for="nx-cn">Nombre</label><input class="nx-t" id="nx-cn" value="${esc(pref.name || '')}">
     <p class="nx-small muted" style="margin-top:10px">Valores por 100 g (o 100 ml)</p>
-    <div class="nx-grid4"><div><label class="nx-f" for="nx-ck">kcal</label><input class="nx-t" id="nx-ck" type="number" inputmode="decimal" min="0" value="${p.kcal ?? ''}"></div>
-    <div><label class="nx-f" for="nx-cc">Hidratos</label><input class="nx-t" id="nx-cc" type="number" inputmode="decimal" min="0" value="${p.c ?? ''}"></div>
-    <div><label class="nx-f" for="nx-cp">Proteína</label><input class="nx-t" id="nx-cp" type="number" inputmode="decimal" min="0" value="${p.p ?? ''}"></div>
-    <div><label class="nx-f" for="nx-cf">Grasa</label><input class="nx-t" id="nx-cf" type="number" inputmode="decimal" min="0" value="${p.f ?? ''}"></div></div>
-    <div class="nx-grid2"><div><label class="nx-f" for="nx-cs">Ración habitual (g)</label><input class="nx-t" id="nx-cs" type="number" inputmode="decimal" min="0" value="${pref.serving ?? ''}"></div>
+    <div class="nx-grid4"><div><label class="nx-f" for="nx-ck">kcal</label><input class="nx-t" id="nx-ck" type="text" data-num="1" min="0" value="${p.kcal ?? ''}"></div>
+    <div><label class="nx-f" for="nx-cc">Hidratos</label><input class="nx-t" id="nx-cc" type="text" data-num="1" min="0" value="${p.c ?? ''}"></div>
+    <div><label class="nx-f" for="nx-cp">Proteína</label><input class="nx-t" id="nx-cp" type="text" data-num="1" min="0" value="${p.p ?? ''}"></div>
+    <div><label class="nx-f" for="nx-cf">Grasa</label><input class="nx-t" id="nx-cf" type="text" data-num="1" min="0" value="${p.f ?? ''}"></div></div>
+    <div class="nx-grid2"><div><label class="nx-f" for="nx-cs">Ración habitual (g)</label><input class="nx-t" id="nx-cs" type="text" data-num="1" min="0" value="${pref.serving ?? ''}"></div>
     <div><label class="nx-f" for="nx-ci">Ingredientes</label><input class="nx-t" id="nx-ci" value="${esc(pref.ingredients || '')}"></div></div>
     <p class="nx-f">Contiene</p><div class="row" style="gap:6px;flex-wrap:wrap" id="nx-ctags">${ALLERGEN_CODES.concat(['LA', 'M', 'F', 'MI']).map(k => `<button class="chip" data-act="nx-ctag" data-v="${k}" aria-pressed="${tags.has(k)}">${esc(k === 'LA' ? 'lactosa' : E.TAGN[k].replace(/ \(.*\)/, ''))}</button>`).join('')}</div>
     <button class="btn" style="width:100%;margin-top:14px" data-act="nx-csave">Guardar y elegir cantidad</button>`);
@@ -6433,7 +6433,7 @@ function reviewSheet(res) {
   const R = restr();
   openSheet(`<h3 class="nx-h3">Revisa las cantidades</h3>${res.warning ? `<div class="nx-alert">${esc(res.warning)}</div>` : ''}
     <p class="nx-small muted">Es una estimación: corrige los gramos si hace falta.</p>
-    ${items.map((it, i) => `<div class="row" style="justify-content:space-between;gap:8px;margin:8px 0"><span class="nx-small" style="flex:1">${issuesBadge(it, R)}${esc(it.name)}</span><input class="nx-t num nx-rv" data-i="${i}" type="number" inputmode="decimal" min="0" value="${r0n(it.g)}" style="width:90px" aria-label="Gramos de ${esc(it.name)}"><span class="nx-small muted">g</span></div>`).join('')}
+    ${items.map((it, i) => `<div class="row" style="justify-content:space-between;gap:8px;margin:8px 0"><span class="nx-small" style="flex:1">${issuesBadge(it, R)}${esc(it.name)}</span><input class="nx-t num nx-rv" data-i="${i}" type="text" data-num="1" min="0" value="${r0n(it.g)}" style="width:90px" aria-label="Gramos de ${esc(it.name)}"><span class="nx-small muted">g</span></div>`).join('')}
     <div class="nx-preview" id="nx-pvv"></div>
     <label class="nx-f" for="nx-rvg">Nombre del plato</label><input class="nx-t" id="nx-rvg" value="${esc(res.dish || 'Plato estimado')}">
     <div class="row" style="gap:8px;margin-top:12px"><button class="btn" data-act="nx-rvok">Añadir</button></div>`);
@@ -6450,9 +6450,9 @@ function bodySheet() {
   UI.sheet = { kind: 'body' };
   openSheet(`<h3 class="nx-h3">Registrar medidas</h3>
     <label class="nx-f" for="nx-bd">Fecha</label><input class="nx-t" id="nx-bd" type="date" value="${TODAY}" max="${TODAY}">
-    <div class="nx-grid2"><div><label class="nx-f" for="nx-bw">Peso (kg)</label><input class="nx-t" id="nx-bw" type="number" step="0.1" inputmode="decimal" min="30" max="200" value="${b.w ?? ''}"></div>
-    <div><label class="nx-f" for="nx-bwa">Cintura (cm)</label><input class="nx-t" id="nx-bwa" type="number" step="0.5" inputmode="decimal" min="40" max="200" value="${b.waist ?? ''}"></div>
-    <div><label class="nx-f" for="nx-bf">% grasa (opcional)</label><input class="nx-t" id="nx-bf" type="number" step="0.1" inputmode="decimal" min="3" max="60" value="${b.fat ?? ''}"></div></div>
+    <div class="nx-grid2"><div><label class="nx-f" for="nx-bw">Peso (kg)</label><input class="nx-t" id="nx-bw" type="text" data-num="1" step="0.1" min="30" max="200" value="${b.w ?? ''}"></div>
+    <div><label class="nx-f" for="nx-bwa">Cintura (cm)</label><input class="nx-t" id="nx-bwa" type="text" data-num="1" step="0.5" min="40" max="200" value="${b.waist ?? ''}"></div>
+    <div><label class="nx-f" for="nx-bf">% grasa (opcional)</label><input class="nx-t" id="nx-bf" type="text" data-num="1" step="0.1" min="3" max="60" value="${b.fat ?? ''}"></div></div>
     <button class="btn" style="width:100%;margin-top:14px" data-act="nx-bsave">Guardar</button>`);
 }
 function addItems(slot, items) {
@@ -7159,7 +7159,7 @@ function viewPerfil() {
   const evOpts = Object.entries(evs).map(([k, v]) => [k, v.n]).concat(f.disciplina === 'running' ? [RUN_OTRA] : []);
   if (!evOpts.some(([k]) => k === f.prueba)) f.prueba = evOpts[0][0];
   const sel = (name, opts, extra) => `<select id="f-${name}" name="${name}" data-f="${name}" ${extra || ''}>${opts.map(([v, l]) => `<option value="${esc(v)}" ${String(f[name]) === String(v) ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`;
-  const num = (name, lab, help, attrs) => `<div class="field"><label for="f-${name}">${lab}</label><input id="f-${name}" name="${name}" data-f="${name}" type="number" value="${esc(f[name] ?? '')}" ${attrs || ''}>${help ? `<small>${help}</small>` : ''}</div>`;
+  const num = (name, lab, help, attrs) => `<div class="field"><label for="f-${name}">${lab}</label><input id="f-${name}" name="${name}" data-f="${name}" type="text" data-num="1" value="${esc(f[name] ?? '')}" ${attrs || ''}>${help ? `<small>${help}</small>` : ''}</div>`;
   const txt = (name, lab, help, attrs) => `<div class="field"><label for="f-${name}">${lab}</label><input id="f-${name}" name="${name}" data-f="${name}" type="text" value="${esc(f[name] ?? '')}" ${attrs || ''}>${help ? `<small>${help}</small>` : ''}</div>`;
   const disc = f.disciplina;
   const discs = new Set([disc].concat(isEx() ? [] : C.races.map(r => r.disciplina)));
@@ -7187,7 +7187,7 @@ function viewPerfil() {
       ${txt('rLugar', 'Lugar', 'Opcional', 'maxlength="80"')}
       ${num('rDistKm', 'Distancia (km)', f.disciplina === 'running' && f.prueba === 'otra' ? 'Obligatoria' : 'Opcional', 'step="0.1" min="0"')}
       ${num('rDesnivel', 'Desnivel positivo (m)', 'Opcional', 'step="10" min="0"')}
-      ${txt('rObjTiempo', 'Tiempo objetivo', 'Opcional · h:mm:ss', 'placeholder="1:45:00" inputmode="numeric"')}
+      ${txt('rObjTiempo', 'Tiempo objetivo', 'Opcional · h:mm:ss', 'placeholder="1:45:00"')}
       <div class="field"><label for="f-nivel">Nivel</label>${sel('nivel', [['principiante', 'Principiante'], ['intermedio', 'Intermedio'], ['avanzado', 'Avanzado']])}</div>
     </div></div>` : `<div class="fsec"><h3>Deporte y nivel</h3><div class="fgrid">
       <div class="field"><label for="f-disciplina">Deporte principal</label>${sel('disciplina', Object.entries(E.PLAN_DISC))}</div>
@@ -7205,7 +7205,7 @@ function viewPerfil() {
       ${num('fcmax', 'FC máxima', '', 'min="120" max="225"')}
       ${bikeish ? num('lthrBike', 'FC umbral bici', 'Media de los 20 min del test', 'min="100" max="210"') : ''}
       ${runish ? num('lthrRun', 'FC umbral carrera', 'Últimos 20 min del test de 30', 'min="100" max="210"') : ''}
-      ${runish ? `<div class="field"><label for="f-marcaDist">Mejor marca reciente</label>${sel('marcaDist', [['', '—'], [5000, '5 km'], [10000, '10 km'], [21097.5, 'Media maratón'], [42195, 'Maratón']])}</div>${txt('marcaTiempo', 'Tiempo', 'mm:ss o h:mm:ss', 'placeholder="46:30" inputmode="numeric"')}` : ''}
+      ${runish ? `<div class="field"><label for="f-marcaDist">Mejor marca reciente</label>${sel('marcaDist', [['', '—'], [5000, '5 km'], [10000, '10 km'], [21097.5, 'Media maratón'], [42195, 'Maratón']])}</div>${txt('marcaTiempo', 'Tiempo', 'mm:ss o h:mm:ss', 'placeholder="46:30"')}` : ''}
       ${swimish ? txt('css', 'CSS natación (/100 m)', 'Ej. 1:48', 'placeholder="1:48"') : ''}
       ${num('vfcBase', 'VFC basal (ms)', 'Media de 7 días, opcional', 'min="10" max="200"')}${num('fcrBase', 'FC en reposo', 'Opcional', 'min="30" max="100"')}
     </div>
@@ -7272,7 +7272,7 @@ function nutriFormSec(f) {
     <div class="q"><span class="ql">¿Qué quieres conseguir con la alimentación?</span>
       <div class="goal-opts">${GOAL_OPTS.map(([k, l, d]) => `<button type="button" data-act="fset" data-k="objetivoNutri" data-v="${k}" aria-pressed="${goal === k}"><b>${esc(l)}</b><span>${esc(d)}</span></button>`).join('')}</div></div>
     ${rates.length ? `<div class="q"><span class="ql">¿A qué ritmo?</span><div class="row" style="gap:6px;flex-wrap:wrap">${rates.map(([k, pct]) => `<button type="button" class="chip" data-act="fset" data-k="ritmo" data-v="${k}" aria-pressed="${ritmo === k}">${E.RATE_N[k]} · ${nf(pct * W, 2)} kg/sem</button>`).join('')}</div></div>
-    <div class="fgrid"><div class="field" style="grid-column:span 2"><label for="f-pesoObjetivo">¿Tienes un peso objetivo? (kg)</label><input id="f-pesoObjetivo" name="pesoObjetivo" data-f="pesoObjetivo" type="number" step="0.1" min="35" max="160" value="${esc(f.pesoObjetivo ?? '')}"><small>Opcional. Al llegar, pasas a mantenimiento.</small></div></div>` : ''}
+    <div class="fgrid"><div class="field" style="grid-column:span 2"><label for="f-pesoObjetivo">¿Tienes un peso objetivo? (kg)</label><input id="f-pesoObjetivo" name="pesoObjetivo" data-f="pesoObjetivo" type="text" data-num="1" step="0.1" min="35" max="160" value="${esc(f.pesoObjetivo ?? '')}"><small>Opcional. Al llegar, pasas a mantenimiento.</small></div></div>` : ''}
     <div id="goal-sum">${goalSumHtml(f)}</div>
     <div class="fgrid"><div class="field"><label for="f-dieta">¿Qué dieta sigues?</label>${`<select id="f-dieta" name="dieta" data-f="dieta">${E.DIET_OPTS.map(([v, l]) => `<option value="${v}" ${f.dieta === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`}</div></div>
     <div class="q"><span class="ql">¿Tienes alguna alergia alimentaria?</span><div class="row" style="gap:6px;flex-wrap:wrap">${chipset('alergias', E.ALLERGY_OPTS, al)}</div></div>
@@ -7661,7 +7661,7 @@ const hmRefCard = m => { const ref = E.formRef(P(), S.refs), hr = S.hmRef ? S.hm
   let nota = '';
   if (hr && ref) { const sec = ref.km * 1000 === 21097.5 ? ref.sec : E.riegel(ref.sec, ref.km, 21.0975), pace = sec / 21.0975; if (Math.abs(pace - hr) / hr > 0.02) nota = `<p class="foot-note" style="margin:6px 0 0">Ojo: tu última referencia (${nf(ref.km, 1)} km en ${clock(Math.round(ref.sec))}${ref.date ? ', ' + esc(E.fmtFechaC(ref.date)) : ''}) equivale a una media a ${E.fmtPace(pace)}/km, y has fijado ${E.fmtPace(hr)}/km. Si ya no es tu forma, actualízalo.</p>`; }
   return `<div><span class="eyebrow">Tu ritmo de media</span>
-    <div class="row" style="gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px"><input id="hm-ref" type="text" inputmode="decimal" placeholder="${E.fmtPace(m.pace.HM)}" value="${hr ? E.fmtPace(hr) : ''}" aria-label="Ritmo de media por km" style="width:90px"><span class="muted" style="font-size:13.5px">/km · ${hr ? 'fijado por ti: todos los ritmos del plan salen de aquí.' : 'ahora el plan usa ' + E.fmtPace(m.pace.HM) + '/km, estimado' + (m.est.vdot ? ' (no tienes marca en el perfil)' : '') + '. Escribe el tuyo, p. ej. 4:30.'}</span>${hr ? '<button class="btn link" data-act="hm-clear">Quitar</button>' : ''}</div>${nota}</div>`; };
+    <div class="row" style="gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px"><input id="hm-ref" type="text" placeholder="${E.fmtPace(m.pace.HM)}" value="${hr ? E.fmtPace(hr) : ''}" aria-label="Ritmo de media por km" style="width:90px"><span class="muted" style="font-size:13.5px">/km · ${hr ? 'fijado por ti: todos los ritmos del plan salen de aquí.' : 'ahora el plan usa ' + E.fmtPace(m.pace.HM) + '/km, estimado' + (m.est.vdot ? ' (no tienes marca en el perfil)' : '') + '. Escribe el tuyo, p. ej. 4:30.'}</span>${hr ? '<button class="btn link" data-act="hm-clear">Quitar</button>' : ''}</div>${nota}</div>`; };
 /* ---------------- importar CSV de Garmin Connect ---------------- */
 function csvParseLines(text) {
   const rows = []; let row = [], field = '', inQ = false;
@@ -8087,6 +8087,11 @@ document.addEventListener('click', ev => {
     }
   }
 });
+/* Teclado completo en iPhone: los campos numéricos son de texto; aquí se limpian (coma → punto, solo cifras). */
+document.addEventListener('input', ev => {
+  const t = ev.target;
+  if (t && t.dataset && t.dataset.num) { const v = String(t.value).replace(/,/g, '.').replace(/[^0-9.\-]/g, ''); if (v !== t.value) t.value = v; }
+}, true);
 document.addEventListener('input', ev => {
   const t = ev.target;
   if (nutriInput(t)) return;
